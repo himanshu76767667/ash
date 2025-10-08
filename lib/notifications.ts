@@ -1,5 +1,8 @@
 // Notification service for class and event reminders
 
+// Store scheduled notification IDs to prevent duplicates
+const scheduledNotifications = new Set<string>();
+
 export const requestNotificationPermission = async (): Promise<boolean> => {
   if (!('Notification' in window)) {
     console.log('This browser does not support notifications');
@@ -65,17 +68,24 @@ export const scheduleClassReminder = (
   const reminderTime = new Date(classTime.getTime() - 30 * 60 * 1000);
   const timeUntilReminder = reminderTime.getTime() - now.getTime();
   
-  if (timeUntilReminder > 0) {
+  // Create unique ID for this notification
+  const notificationId = `class-${courseCode}-${time}-${now.toDateString()}`;
+  
+  // Only schedule if not already scheduled and time is in the future
+  if (timeUntilReminder > 0 && !scheduledNotifications.has(notificationId)) {
+    scheduledNotifications.add(notificationId);
+    
     setTimeout(() => {
       showNotification(`Class Starting Soon! 🎓`, {
         body: `${courseCode} - ${courseName}\nStarts in 30 minutes at ${time}\nLocation: ${classroom}`,
-        tag: `class-${courseCode}-${time}`,
+        tag: notificationId,
         requireInteraction: false,
         silent: false,
       });
+      scheduledNotifications.delete(notificationId);
     }, timeUntilReminder);
     
-    console.log(`Scheduled reminder for ${courseCode} at ${time} (30 mins before)`);
+    console.log(`✅ Scheduled reminder for ${courseCode} at ${time} (in ${Math.round(timeUntilReminder / 60000)} mins)`);
   }
 };
 
@@ -100,19 +110,35 @@ export const scheduleEventReminder = (
   const reminderTime = new Date(eventDate.getTime() - 24 * 60 * 60 * 1000);
   const timeUntilReminder = reminderTime.getTime() - now.getTime();
   
-  if (timeUntilReminder > 0 && timeUntilReminder < 30 * 24 * 60 * 60 * 1000) { // Within 30 days
+  // Create unique ID for this notification
+  const notificationId = `event-${type}-${courseCode}-${date}`;
+  
+  // Only schedule if within 30 days, in the future, and not already scheduled
+  if (timeUntilReminder > 0 && 
+      timeUntilReminder < 30 * 24 * 60 * 60 * 1000 && 
+      !scheduledNotifications.has(notificationId)) {
+    
+    scheduledNotifications.add(notificationId);
+    
     setTimeout(() => {
       const emoji = type === 'exam' ? '📝' : '⏰';
       showNotification(`${emoji} ${type.toUpperCase()} Tomorrow!`, {
         body: `${courseCode} - ${title}\nDue: ${new Date(date).toLocaleDateString()} at ${time}`,
-        tag: `event-${type}-${courseCode}-${date}`,
+        tag: notificationId,
         requireInteraction: true,
         silent: false,
       });
+      scheduledNotifications.delete(notificationId);
     }, timeUntilReminder);
     
-    console.log(`Scheduled ${type} reminder for ${courseCode} - ${title} (1 day before)`);
+    console.log(`✅ Scheduled ${type} reminder for ${courseCode} - ${title} (in ${Math.round(timeUntilReminder / 3600000)} hours)`);
   }
+};
+
+// Clear all scheduled notifications
+export const clearScheduledNotifications = () => {
+  scheduledNotifications.clear();
+  console.log('🧹 Cleared all scheduled notifications');
 };
 
 // Schedule all reminders for today's classes and upcoming events
@@ -122,12 +148,8 @@ export const initializeNotifications = async () => {
   if (hasPermission) {
     console.log('✅ Notification permission granted');
     
-    // Show a test notification
-    showNotification('🎓 ash Notifications Enabled!', {
-      body: "You'll get reminders 30 mins before classes and 1 day before deadlines/exams",
-      tag: 'welcome',
-      silent: true,
-    });
+    // Don't show test notification on every init
+    // Only show if notifications were just enabled
   } else {
     console.log('❌ Notification permission denied');
   }

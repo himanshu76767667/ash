@@ -11,7 +11,6 @@ import FAB from '@/components/FAB';
 import SettingsModal from '@/components/SettingsModal';
 import { initializeNotifications, scheduleClassReminder, scheduleEventReminder } from '@/lib/notifications';
 import { setupBackButton, onVisibilityChange } from '@/lib/mobileUtils';
-import { useNetworkStatus } from '@/lib/networkStatus';
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -25,7 +24,6 @@ export default function Home() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
-  const { isOnline, wasOffline } = useNetworkStatus();
 
   // Handle mobile back button
   useEffect(() => {
@@ -46,21 +44,9 @@ export default function Home() {
   // Handle app visibility (refresh notifications when app comes to foreground)
   useEffect(() => {
     const cleanup = onVisibilityChange((isVisible) => {
-      if (isVisible) {
-        // Refresh notification permission status
-        if ('Notification' in window) {
-          setNotificationsEnabled(Notification.permission === 'granted');
-        }
-        // Re-schedule notifications
-        const schedule = getDaySchedule(new Date());
-        Object.values(schedule).forEach((classItem) => {
-          scheduleClassReminder(
-            classItem.courseCode,
-            classItem.courseName,
-            classItem.time,
-            classItem.classroom
-          );
-        });
+      if (isVisible && 'Notification' in window) {
+        // Just refresh notification permission status
+        setNotificationsEnabled(Notification.permission === 'granted');
       }
     });
     return cleanup;
@@ -206,29 +192,6 @@ export default function Home() {
         transition: isPulling ? 'none' : 'padding-top 0.1s ease-out'
       }}
     >
-      {/* Network status indicator */}
-      {(!isOnline || wasOffline) && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg ${
-            isOnline
-              ? 'bg-green-500/90 text-white'
-              : 'bg-orange-500/90 text-white'
-          }`}
-        >
-          <span className="text-sm">
-            {isOnline ? '✅' : '⚠️'}
-          </span>
-          <span>
-            {isOnline 
-              ? 'Back online - Syncing...' 
-              : 'Offline - Using cached data'}
-          </span>
-        </motion.div>
-      )}
-
       {/* Static background gradients - optimized for Chrome */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
