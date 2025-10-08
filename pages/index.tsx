@@ -10,6 +10,8 @@ import UpcomingList from '@/components/UpcomingList';
 import FAB from '@/components/FAB';
 import SettingsModal from '@/components/SettingsModal';
 import { initializeNotifications, scheduleClassReminder, scheduleEventReminder } from '@/lib/notifications';
+import { setupBackButton, onVisibilityChange } from '@/lib/mobileUtils';
+import { useNetworkStatus } from '@/lib/networkStatus';
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,6 +25,46 @@ export default function Home() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
+  const { isOnline, wasOffline } = useNetworkStatus();
+
+  // Handle mobile back button
+  useEffect(() => {
+    const cleanup = setupBackButton(() => {
+      if (isSettingsOpen) {
+        setIsSettingsOpen(false);
+      } else if (isModalOpen) {
+        setIsModalOpen(false);
+      } else if (!isSameDay(currentDate, new Date())) {
+        // Go back to today
+        setDirection(0);
+        setCurrentDate(new Date());
+      }
+    });
+    return cleanup;
+  }, [isModalOpen, isSettingsOpen, currentDate]);
+
+  // Handle app visibility (refresh notifications when app comes to foreground)
+  useEffect(() => {
+    const cleanup = onVisibilityChange((isVisible) => {
+      if (isVisible) {
+        // Refresh notification permission status
+        if ('Notification' in window) {
+          setNotificationsEnabled(Notification.permission === 'granted');
+        }
+        // Re-schedule notifications
+        const schedule = getDaySchedule(new Date());
+        Object.values(schedule).forEach((classItem) => {
+          scheduleClassReminder(
+            classItem.courseCode,
+            classItem.courseName,
+            classItem.time,
+            classItem.classroom
+          );
+        });
+      }
+    });
+    return cleanup;
+  }, []);
 
   // Initialize notifications on mount
   useEffect(() => {
@@ -164,36 +206,102 @@ export default function Home() {
         transition: isPulling ? 'none' : 'padding-top 0.1s ease-out'
       }}
     >
-      {/* Static background - no animations for performance */}
+      {/* Network status indicator */}
+      {(!isOnline || wasOffline) && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg ${
+            isOnline
+              ? 'bg-green-500/90 text-white'
+              : 'bg-orange-500/90 text-white'
+          }`}
+        >
+          <span className="text-sm">
+            {isOnline ? '✅' : '⚠️'}
+          </span>
+          <span>
+            {isOnline 
+              ? 'Back online - Syncing...' 
+              : 'Offline - Using cached data'}
+          </span>
+        </motion.div>
+      )}
+
+      {/* Static background gradients - optimized for Chrome */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-purple-800/5 rounded-full blur-3xl" />
+        <motion.div
+          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-900/7 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.07, 0.09, 0.07],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 -left-40 w-80 h-80 bg-purple-800/7 rounded-full blur-3xl"
+          animate={{
+            scale: [1.1, 1, 1.1],
+            opacity: [0.07, 0.05, 0.07],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.div
+          className="absolute bottom-32 right-1/4 w-64 h-64 bg-pink-900/5 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.05, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
       </div>
 
-      {/* Pull to refresh indicator */}
+      {/* Pull to refresh indicator - Enhanced */}
       {isPulling && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: pullDistance > 40 ? 1 : 0.3 }}
-          className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ 
+            opacity: pullDistance > 40 ? 1 : 0.5,
+            y: 0,
+            scale: pullDistance > 80 ? 1.05 : 1
+          }}
+          className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
         >
           <div 
-            className="backdrop-blur-xl rounded-2xl px-6 py-3 flex items-center gap-3 border"
+            className="backdrop-blur-2xl rounded-2xl px-5 py-3 flex items-center gap-3"
             style={{
-              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2))',
-              borderColor: 'rgba(168, 85, 247, 0.3)',
-              boxShadow: '0 8px 32px rgba(168, 85, 247, 0.3)',
+              background: pullDistance > 80 
+                ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(236, 72, 153, 0.35))'
+                : 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2))',
+              border: pullDistance > 80
+                ? '2px solid rgba(168, 85, 247, 0.6)'
+                : '1.5px solid rgba(168, 85, 247, 0.3)',
+              boxShadow: pullDistance > 80
+                ? '0 10px 40px rgba(168, 85, 247, 0.5), 0 0 20px rgba(236, 72, 153, 0.3)'
+                : '0 8px 32px rgba(168, 85, 247, 0.3)',
             }}
           >
             <motion.div
-              animate={{ rotate: pullDistance > 80 ? 360 : 0 }}
-              transition={{ duration: 0.1 }}
+              animate={{ rotate: pullDistance > 80 ? 360 : pullDistance * 4 }}
+              transition={{ duration: pullDistance > 80 ? 0.3 : 0 }}
               className="text-2xl"
             >
               🔄
             </motion.div>
             <span className="text-sm font-bold text-white">
-              {pullDistance > 80 ? 'Release to go to Today' : 'Pull to refresh'}
+              {pullDistance > 80 ? '✨ Release to refresh!' : '↓ Pull to refresh'}
             </span>
           </div>
         </motion.div>
@@ -201,56 +309,95 @@ export default function Home() {
 
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 px-6 py-5 border-b"
+        className="sticky top-0 z-10 px-4 py-4 border-b"
         style={{
-          background: 'linear-gradient(to bottom, rgba(16, 17, 26, 0.95), rgba(16, 17, 26, 0.8))',
+          background: 'linear-gradient(to bottom, rgba(10, 11, 18, 0.98), rgba(10, 11, 18, 0.95))',
           backdropFilter: 'blur(20px)',
-          borderColor: 'rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)',
+          borderColor: 'rgba(168, 85, 247, 0.15)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
         }}
       >
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-white">
-            {format(currentDate, 'EEEE, d MMMM')}
-          </h1>
-          
-          <div className="flex items-center gap-3">
-            {/* Settings Button */}
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-2.5 rounded-full transition-all"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-              }}
-              title="Settings"
-            >
-              <span className="text-xl">⚙️</span>
-            </motion.button>
-            
-            {/* Today button - only show if not viewing today */}
-            {!isToday && (
-              <button
-                onClick={goToToday}
-                className="px-5 py-2.5 rounded-full text-sm font-bold active:opacity-70"
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2">
+              <motion.h1
+                key={currentDate.toISOString()}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.15 }}
+                className="text-2xl font-extrabold uppercase tracking-tight truncate"
                 style={{
-                  background: 'rgba(168, 85, 247, 0.15)',
-                  border: '1px solid rgba(168, 85, 247, 0.3)',
-                  color: '#A855F7',
+                  background: 'linear-gradient(135deg, #A855F7 0%, #EC4899 50%, #A855F7 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textShadow: '0 0 30px rgba(168, 85, 247, 0.3)',
                 }}
               >
-                📅 Today
-              </button>
-            )}
+                {format(currentDate, 'EEE, d MMM')}
+              </motion.h1>
+              
+              {/* Today button - compact, only show if not viewing today */}
+              {!isToday && (
+                <motion.button
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={goToToday}
+                  className="px-3 py-1 rounded-full text-xs font-bold shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25))',
+                    border: '1.5px solid rgba(168, 85, 247, 0.5)',
+                    color: '#EC4899',
+                    boxShadow: '0 2px 10px rgba(168, 85, 247, 0.3)',
+                  }}
+                >
+                  Today
+                </motion.button>
+              )}
+            </div>
+            
+            {/* Date subtitle */}
+            <motion.p
+              key={currentDate.toISOString() + '-year'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xs text-gray-500 font-medium mt-0.5"
+            >
+              {format(currentDate, 'MMMM yyyy')}
+            </motion.p>
           </div>
+
+          {/* Settings Button - rightmost */}
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsSettingsOpen(true)}
+            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15))',
+              border: '1.5px solid rgba(168, 85, 247, 0.3)',
+              boxShadow: '0 4px 15px rgba(168, 85, 247, 0.2)',
+            }}
+            title="Settings"
+          >
+            <span className="text-xl">⚙️</span>
+          </motion.button>
         </div>
 
         {/* Swipe indicator */}
-        <div className="text-xs text-gray-600 mt-3 text-center font-medium">
-          ← Swipe to navigate →
-        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.4, 0.7, 0.4] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-[10px] text-gray-600 mt-2 text-center font-medium flex items-center justify-center gap-1"
+        >
+          <span>←</span>
+          <span>Swipe to navigate</span>
+          <span>→</span>
+        </motion.div>
       </header>
 
       {/* Daily Agenda with improved swipe */}

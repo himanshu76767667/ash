@@ -14,6 +14,11 @@ export default function Document() {
         <meta name="theme-color" content="#0A0B12" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         
+        {/* Chrome/Android specific */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0B12" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0A0B12" />
+        
         {/* Manifest */}
         <link rel="manifest" href="/manifest.json" />
         

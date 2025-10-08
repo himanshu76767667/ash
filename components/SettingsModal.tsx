@@ -81,6 +81,14 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, info) => {
+              if (info.offset.x > 150) {
+                onClose(); // Close if swiped right more than 150px
+              }
+            }}
             className="fixed right-0 top-0 bottom-0 w-full sm:w-96 z-50"
             style={{
               background: 'linear-gradient(135deg, #0A0B12 0%, #15161F 100%)',

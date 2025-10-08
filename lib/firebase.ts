@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence, enableMultiTabIndexedDbPersistence } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,3 +18,26 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firestore and export it
 export const db = getFirestore(app);
+
+// Enable offline persistence (IndexedDB)
+// This allows data to persist across page refreshes and work offline
+if (typeof window !== 'undefined') {
+  enableMultiTabIndexedDbPersistence(db)
+    .then(() => {
+      console.log('✅ Offline persistence enabled - Events will sync when online!');
+    })
+    .catch((err) => {
+      if (err.code === 'failed-precondition') {
+        console.warn('⚠️ Multiple tabs open - Using single-tab persistence');
+        // Try single-tab persistence as fallback
+        enableIndexedDbPersistence(db).catch((error) => {
+          console.error('❌ Persistence failed:', error);
+        });
+      } else if (err.code === 'unimplemented') {
+        console.warn('⚠️ Browser doesn\'t support persistence');
+      } else {
+        console.error('❌ Persistence error:', err);
+      }
+    });
+}
+

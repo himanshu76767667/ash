@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { UserEvent } from '@/lib/types';
 import { createEvent, updateEvent, deleteEvent } from '@/lib/eventService';
+import { vibrate } from '@/lib/mobileUtils';
 
 interface EventModalProps {
   event: UserEvent | null;
@@ -15,6 +16,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (event) {
@@ -31,6 +33,11 @@ export default function EventModal({ event, onClose }: EventModalProps) {
   }, [event]);
 
   const handleSave = async () => {
+    if (isSaving) return; // Prevent double submission
+    
+    setIsSaving(true);
+    vibrate(50); // Haptic feedback
+    
     const eventData = {
       type,
       courseCode,
@@ -46,19 +53,25 @@ export default function EventModal({ event, onClose }: EventModalProps) {
       } else {
         await createEvent(eventData);
       }
-      onClose();
+      vibrate([50, 50, 50]); // Success vibration
+      onClose(); // Auto-close after saving
     } catch (error) {
       console.error('Error saving event:', error);
+      vibrate([100, 50, 100, 50, 100]); // Error vibration
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
     if (event?.id) {
+      vibrate(100); // Haptic feedback
       try {
         await deleteEvent(event.id);
+        vibrate([50, 50]); // Success vibration
         onClose();
       } catch (error) {
         console.error('Error deleting event:', error);
+        vibrate([100, 50, 100]); // Error vibration
       }
     }
   };
@@ -74,18 +87,30 @@ export default function EventModal({ event, onClose }: EventModalProps) {
         className="fixed inset-0 bg-black/90 backdrop-blur-md z-40"
       />
 
-      {/* Modal */}
+      {/* Modal - Swipe down to close */}
       <motion.div
         initial={{ opacity: 0, y: '100%', scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: '100%', scale: 0.9 }}
         transition={{ type: 'tween', duration: 0.1 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(e, info) => {
+          if (info.offset.y > 150) {
+            onClose(); // Close if swiped down more than 150px
+          }
+        }}
         className="fixed inset-x-0 bottom-0 top-20 rounded-t-3xl z-50 overflow-hidden"
         style={{
           background: 'linear-gradient(to bottom, #10111A 0%, #0A0B12 100%)',
           boxShadow: '0 -10px 60px -10px rgba(168, 85, 247, 0.3)',
         }}
       >
+        {/* Drag handle indicator */}
+        <div className="w-full flex justify-center py-3 cursor-grab active:cursor-grabbing">
+          <div className="w-12 h-1.5 bg-gray-600 rounded-full"></div>
+        </div>
         {/* Animated gradient background */}
         <div className="absolute inset-0 opacity-30">
           <motion.div
@@ -284,13 +309,17 @@ export default function EventModal({ event, onClose }: EventModalProps) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSave}
+                disabled={isSaving}
                 className="flex-1 py-5 rounded-xl text-white font-bold transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)',
+                  background: isSaving 
+                    ? 'linear-gradient(135deg, #6B21A8 0%, #9D174D 100%)'
+                    : 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)',
                   boxShadow: '0 10px 30px rgba(168, 85, 247, 0.4)',
+                  opacity: isSaving ? 0.7 : 1,
                 }}
               >
-                {event ? '✅ Save Changes' : '➕ Add Event'}
+                {isSaving ? '⏳ Saving...' : (event ? '✅ Save Changes' : '➕ Add Event')}
               </motion.button>
             </motion.div>
           </div>
