@@ -5,7 +5,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   experimental: {
-    optimizeCss: true,
     scrollRestoration: true,
   },
   compiler: {
