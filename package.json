@@ -15,7 +15,7 @@
     "doctor": "node -v && npm -v && npx next --version"
   },
   "engines": {
-    "node": ">=18 <22"
+    "node": ">=16 <22"
   },
   "dependencies": {
     "date-fns": "^3.3.0",

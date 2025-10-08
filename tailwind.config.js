@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#10111A',
+        background: '#0A0B12',
         primary: '#A855F7',
         accent: {
           lime: '#84CC16',
@@ -16,6 +16,10 @@ module.exports = {
           purple: '#A855F7',
           orange: '#FB923C',
         },
+      },
+      transitionDuration: {
+        'fast': '100ms',
+        'normal': '150ms',
       },
     },
   },

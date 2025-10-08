@@ -71,125 +71,228 @@ export default function EventModal({ event, onClose }: EventModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+        className="fixed inset-0 bg-black/90 backdrop-blur-md z-40"
       />
 
       {/* Modal */}
       <motion.div
-        initial={{ opacity: 0, y: '100%' }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed inset-x-0 bottom-0 top-20 bg-gradient-to-b from-background to-background/95 rounded-t-3xl z-50 overflow-y-auto"
+        initial={{ opacity: 0, y: '100%', scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: '100%', scale: 0.9 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="fixed inset-x-0 bottom-0 top-20 rounded-t-3xl z-50 overflow-hidden"
+        style={{
+          background: 'linear-gradient(to bottom, #10111A 0%, #0A0B12 100%)',
+          boxShadow: '0 -10px 60px -10px rgba(168, 85, 247, 0.3)',
+        }}
       >
-        <div className="sticky top-0 bg-background/90 backdrop-blur-md border-b border-white/10 px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">
-            {event ? 'Edit Event' : 'Add Event'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 opacity-30">
+          <motion.div
+            className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+          <motion.div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-accent-pink rounded-full blur-3xl"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.3, 0.2, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
         </div>
 
-        <div className="px-6 py-6 space-y-6">
-          {/* Type Toggle */}
-          <div>
-            <label className="block text-sm font-semibold mb-3 text-gray-300">Type</label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setType('deadline')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition ${
-                  type === 'deadline'
-                    ? 'bg-primary text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                Deadline
-              </button>
-              <button
-                onClick={() => setType('exam')}
-                className={`flex-1 py-3 rounded-xl font-semibold transition ${
-                  type === 'exam'
-                    ? 'bg-primary text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                Exam
-              </button>
-            </div>
-          </div>
-
-          {/* Course Code */}
-          <div>
-            <label className="block text-sm font-semibold mb-3 text-gray-300">
-              Course Code
-            </label>
-            <input
-              type="text"
-              value={courseCode}
-              onChange={(e) => setCourseCode(e.target.value)}
-              placeholder="e.g., CS230"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary focus:outline-none transition"
-            />
-          </div>
-
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-semibold mb-3 text-gray-300">
-              Title / Description
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Assignment 3"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary focus:outline-none transition"
-            />
-          </div>
-
-          {/* Date */}
-          <div>
-            <label className="block text-sm font-semibold mb-3 text-gray-300">Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary focus:outline-none transition"
-            />
-          </div>
-
-          {/* Time */}
-          <div>
-            <label className="block text-sm font-semibold mb-3 text-gray-300">Time</label>
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary focus:outline-none transition"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            {event && (
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-4 rounded-xl bg-red-500/20 text-red-400 font-semibold hover:bg-red-500/30 transition"
-              >
-                Delete
-              </button>
-            )}
-            <button
-              onClick={handleSave}
-              className="flex-1 py-4 rounded-xl bg-gradient-to-r from-primary to-accent-pink text-white font-semibold hover:shadow-lg transition"
+        <div className="relative h-full flex flex-col">
+          {/* Header */}
+          <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-white/10 px-6 py-5 flex justify-between items-center z-10">
+            <motion.h2 
+              className="text-2xl font-bold bg-gradient-to-r from-primary to-accent-pink bg-clip-text text-transparent"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
             >
-              {event ? 'Save Changes' : 'Add Event'}
-            </button>
+              {event ? 'Edit Event' : 'Add New Event'}
+            </motion.h2>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+              className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all"
+              style={{
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </motion.button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+            {/* Type Toggle */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Event Type</label>
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setType('deadline')}
+                  className={`flex-1 py-4 rounded-xl font-bold transition-all ${
+                    type === 'deadline'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  📝 Deadline
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setType('exam')}
+                  className={`flex-1 py-4 rounded-xl font-bold transition-all ${
+                    type === 'exam'
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  📚 Exam
+                </motion.button>
+              </div>
+            </motion.div>
+
+            {/* Course Code */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">
+                Course Code
+              </label>
+              <input
+                type="text"
+                value={courseCode}
+                onChange={(e) => setCourseCode(e.target.value)}
+                placeholder="e.g., CS230"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border-2 border-white/10 focus:border-primary focus:outline-none transition-all text-white placeholder-gray-500 font-medium"
+                style={{
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                }}
+              />
+            </motion.div>
+
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">
+                Title / Description
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., Assignment 3"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border-2 border-white/10 focus:border-primary focus:outline-none transition-all text-white placeholder-gray-500 font-medium"
+                style={{
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                }}
+              />
+            </motion.div>
+
+            {/* Date and Time - Side by side */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Date */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Date</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full px-4 py-4 rounded-xl bg-white/5 border-2 border-white/10 focus:border-primary focus:outline-none transition-all text-white font-medium"
+                  style={{
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+              </motion.div>
+
+              {/* Time */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Time</label>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full px-4 py-4 rounded-xl bg-white/5 border-2 border-white/10 focus:border-primary focus:outline-none transition-all text-white font-medium"
+                  style={{
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+              </motion.div>
+            </div>
+
+            {/* Buttons */}
+            <motion.div 
+              className="flex gap-3 pt-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {event && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleDelete}
+                  className="flex-1 py-5 rounded-xl font-bold transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%)',
+                    color: '#EF4444',
+                    border: '2px solid rgba(239, 68, 68, 0.3)',
+                    boxShadow: '0 4px 20px rgba(239, 68, 68, 0.2)',
+                  }}
+                >
+                  🗑️ Delete Event
+                </motion.button>
+              )}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSave}
+                className="flex-1 py-5 rounded-xl text-white font-bold transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)',
+                  boxShadow: '0 10px 30px rgba(168, 85, 247, 0.4)',
+                }}
+              >
+                {event ? '✅ Save Changes' : '➕ Add Event'}
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       </motion.div>

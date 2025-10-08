@@ -1,12 +1,14 @@
 {
-  "name": "ash",
+  "name": "ash - Daily Agenda",
   "short_name": "ash",
-  "description": "Collaborative daily agenda and planner",
+  "description": "Your collaborative daily agenda and planner for IITB",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#10111A",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "background_color": "#0A0B12",
   "theme_color": "#A855F7",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "/logo.jpg",
@@ -19,6 +21,23 @@
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "180x180",
+      "type": "image/jpeg",
+      "purpose": "apple-touch-icon"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Today's Agenda",
+      "short_name": "Today",
+      "description": "View today's schedule",
+      "url": "/",
+      "icons": [{ "src": "/logo.jpg", "sizes": "192x192" }]
     }
   ]
 }
