@@ -66,8 +66,8 @@ export default function Home() {
     ...Object.values(schedule),
     ...todayEvents.map((e) => ({ ...e, isEvent: true })),
   ].sort((a, b) => {
-    const timeA = 'time' in a ? a.time : a.time;
-    const timeB = 'time' in b ? b.time : b.time;
+    const timeA = (a as any).time;
+    const timeB = (b as any).time;
     return timeA.localeCompare(timeB);
   });
 

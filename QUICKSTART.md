@@ -2,12 +2,31 @@
 
 Welcome to **ash** - your collaborative daily planner!
 
+## 🚨 CRITICAL: Check Your Node Version First!
+
+**Before anything else**, verify you have the correct Node.js version:
+
+```bash
+node -v
+```
+
+**Required:** v20.x.x or v18.x.x  
+**NOT compatible:** v22.x.x ❌
+
+**If you have Node v22:** The app will crash! See [FIX_NODE_VERSION.md](./FIX_NODE_VERSION.md) for fix instructions.
+
+**Windows users:** Run `check-node.cmd` to automatically verify compatibility.
+
+---
+
 ## ⚡ Quick Start (3 Steps)
 
-### 1️⃣ Install Node.js
-- Download from: https://nodejs.org/
-- Choose the LTS version
+### 1️⃣ Install Node.js 20 LTS
+- Download from: https://nodejs.org/en/download
+- Choose **20.18.0 LTS** (the green "Recommended For Most Users" button)
+- **Important:** If you have Node v22, uninstall it first
 - Restart your computer after installation
+- Verify: `node -v` should show v20.x.x
 
 ### 2️⃣ Install Dependencies
 ```bash
@@ -30,6 +49,8 @@ npm run dev
 
 Open http://localhost:3000
 
+**Full testing guide**: See `LOCAL_TESTING.md` for comprehensive local testing instructions
+
 ## 📱 Key Features
 
 - **Swipe Navigation**: Swipe left/right between days
@@ -49,8 +70,10 @@ Open http://localhost:3000
 
 ## 📖 Full Documentation
 
+- `LOCAL_TESTING.md` - Complete local testing guide
 - `INSTALLATION.md` - Detailed installation guide
 - `FIREBASE_SETUP.md` - Step-by-step Firebase configuration
+- `DEPLOY_IITB.md` - Deploy to IITB mars server
 - `README.md` - Complete project documentation
 
 ## 🎯 Class Schedule

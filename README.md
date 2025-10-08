@@ -2,6 +2,20 @@
 
 A stunning Progressive Web App (PWA) for collaborative daily planning, combining a fixed class schedule with shared deadlines and exams.
 
+## 🚨 IMPORTANT: Node.js Version Requirement
+
+**This app requires Node.js 20 LTS or Node.js 18 LTS to run.**
+
+If you're getting **ERR_CONNECTION_REFUSED** or the server crashes immediately:
+1. Check your Node version: `node -v`
+2. If you have v22.x.x, you **must** switch to v20.x.x
+3. **See [FIX_NODE_VERSION.md](./FIX_NODE_VERSION.md) for detailed instructions**
+4. Or run: `check-node.cmd` to verify your Node version
+
+**Quick fix:** Download Node 20 LTS from https://nodejs.org/en/download
+
+---
+
 ## Features
 
 ✨ **Beautiful Dark Theme** - Vibrant colors on a sleek dark background  

@@ -36,32 +36,70 @@ Enter your LDAP password when prompted.
 
 ## Step 2: Set Up Environment on Mars
 
-### Install Node.js (If Not Available)
+### ⚠️ Important: Install Node.js 20 (mars has v17.8.0 which is too old)
+
+**Mars currently has Node v17.8.0, which won't work with Next.js 14.**  
+You need to install Node 20 using nvm in your user directory.
 
 Once logged into mars:
 
 ```bash
-# Check if Node.js is installed
+# Check current Node version (will show v17.8.0 - too old!)
 node --version
 
-# If not installed or version is old, install using nvm
+# Install nvm (Node Version Manager) in your home directory
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
-# Reload shell
+# Reload shell configuration
 source ~/.bashrc
 
-# Install latest LTS Node.js
-nvm install --lts
-nvm use --lts
+# Install Node 20 LTS
+nvm install 20
+nvm use 20
 
-# Verify
-node --version  # Should show v20.x.x or higher
-npm --version   # Should show v10.x.x or higher
+# Set Node 20 as default
+nvm alias default 20
+
+# Verify installation
+node --version  # Should show v20.x.x
+npm --version   # Should show v10.x.x
+
+# Add to .bashrc to auto-load on login
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
+echo 'nvm use 20' >> ~/.bashrc
 ```
 
 ---
 
 ## Step 3: Transfer Your Project to Mars
+
+### ⚡ Quick Deploy Option: Automated Script
+
+I've created an automated deployment script for you! After uploading your project:
+
+```bash
+# Make the script executable
+chmod +x deploy-mars.sh
+
+# Run it!
+./deploy-mars.sh
+```
+
+This script will:
+1. Check/install Node 20 if needed
+2. Install all dependencies
+3. Build the production bundle
+4. Setup PM2 process manager
+5. Start your app automatically
+
+**That's it! Your app will be running!** 🚀
+
+---
+
+### Manual Deploy Options
+
+If you prefer manual control, choose one:
 
 ### Option A: Using Git (Recommended)
 

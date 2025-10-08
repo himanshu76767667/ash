@@ -7,7 +7,6 @@ import {
   onSnapshot,
   query,
   orderBy,
-  Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { UserEvent } from './types';
