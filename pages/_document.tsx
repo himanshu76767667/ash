@@ -7,12 +7,12 @@ export default function Document() {
         {/* PWA Meta Tags for Fullscreen */}
         <meta name="application-name" content="ash" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="ash" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#A855F7" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#0A0B12" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         
         {/* Manifest */}
         <link rel="manifest" href="/manifest.json" />
@@ -26,7 +26,6 @@ export default function Document() {
         
         {/* iOS Splash Screens */}
         <link rel="apple-touch-startup-image" href="/logo.jpg" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </Head>
       <body>
         <Main />

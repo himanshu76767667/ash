@@ -79,7 +79,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
         initial={{ opacity: 0, y: '100%', scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: '100%', scale: 0.9 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        transition={{ type: 'tween', duration: 0.1 }}
         className="fixed inset-x-0 bottom-0 top-20 rounded-t-3xl z-50 overflow-hidden"
         style={{
           background: 'linear-gradient(to bottom, #10111A 0%, #0A0B12 100%)',
@@ -145,7 +145,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0 }}
             >
               <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Event Type</label>
               <div className="flex gap-3">
@@ -180,7 +180,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0 }}
             >
               <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">
                 Course Code
@@ -201,7 +201,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0 }}
             >
               <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">
                 Title / Description
@@ -224,7 +224,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0 }}
               >
                 <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Date</label>
                 <input
@@ -242,7 +242,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0 }}
               >
                 <label className="block text-sm font-bold mb-3 text-gray-300 uppercase tracking-wider">Time</label>
                 <input
@@ -262,7 +262,7 @@ export default function EventModal({ event, onClose }: EventModalProps) {
               className="flex gap-3 pt-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0 }}
             >
               {event && (
                 <motion.button

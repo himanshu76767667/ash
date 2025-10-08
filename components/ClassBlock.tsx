@@ -59,168 +59,105 @@ export default function ClassBlock({ item, onEdit }: ClassBlockProps) {
   if (isClass) {
     const classItem = item as ClassSession;
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
+      <div
         onClick={() => setShowFullName(!showFullName)}
-        className="relative overflow-hidden rounded-2xl p-5 cursor-pointer group"
+        className="relative overflow-hidden rounded-2xl p-5 active:opacity-80 mb-4"
         style={{ 
-          background: `linear-gradient(135deg, ${CLASS_COLOR}15 0%, ${CLASS_COLOR}08 100%)`,
-          borderLeft: `4px solid ${CLASS_COLOR}`,
-          boxShadow: `0 4px 20px -4px ${CLASS_COLOR}40, 0 0 0 1px ${CLASS_COLOR}20`,
+          background: `linear-gradient(135deg, ${CLASS_COLOR}12 0%, ${CLASS_COLOR}06 100%)`,
+          borderLeft: `3px solid ${CLASS_COLOR}`,
+          boxShadow: `0 2px 8px ${CLASS_COLOR}20`,
         }}
       >
-        {/* Animated gradient overlay */}
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-100"
-          style={{
-            background: `radial-gradient(circle at top right, ${CLASS_COLOR}20, transparent 70%)`,
-          }}
-        />
         
-        <div className="relative flex justify-between items-start">
+        <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="text-2xl font-bold tracking-tight" style={{ color: CLASS_COLOR }}>
+            <h3 className="text-xl font-bold" style={{ color: CLASS_COLOR }}>
               {classItem.courseCode}
             </h3>
-            <motion.p
-              initial={false}
-              animate={{ 
-                height: showFullName ? 'auto' : 0, 
-                opacity: showFullName ? 1 : 0,
-                marginTop: showFullName ? 8 : 0
-              }}
-              transition={{ duration: 0.1, ease: 'easeOut' }}
-              className="text-sm text-gray-300 font-medium overflow-hidden"
-            >
-              {classItem.courseName}
-            </motion.p>
-            <div className="flex items-center gap-2 mt-3">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {showFullName && (
+              <p className="text-sm text-gray-400 font-medium mt-2">
+                {classItem.courseName}
+              </p>
+            )}
+            <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <p className="text-sm text-gray-400">{classItem.classroom}</p>
+              <span>{classItem.classroom}</span>
             </div>
           </div>
           <div className="text-right">
-            <div className="flex items-center gap-2 justify-end">
-              <svg className="w-5 h-5" style={{ color: CLASS_COLOR }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-xl font-bold" style={{ color: CLASS_COLOR }}>
-                {classItem.time}
-              </p>
-            </div>
+            <p className="text-lg font-bold" style={{ color: CLASS_COLOR }}>
+              {classItem.time}
+            </p>
           </div>
         </div>
-        
-        {/* Subtle tap hint */}
-        <motion.div 
-          className="absolute bottom-2 right-2 text-xs text-gray-500"
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 1, repeat: Infinity }}
-        >
-          Tap for details
-        </motion.div>
-      </motion.div>
+      </div>
     );
   }
 
-  // Event rendering - now styled like class blocks
+  // Event rendering - simplified for performance
   const eventItem = item as UserEvent;
   const eventColor = eventItem.type === 'exam' ? EXAM_COLOR : DEADLINE_COLOR;
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ 
-        opacity: isCompleted ? 0.4 : 1, 
-        y: 0,
-        scale: isCompleted ? 0.98 : 1
-      }}
-      whileHover={{ scale: isCompleted ? 0.98 : 1.02, y: isCompleted ? 0 : -2 }}
-      whileTap={{ scale: 0.98 }}
-      className="relative overflow-hidden rounded-2xl p-5 cursor-pointer group"
+    <div
+      className="relative overflow-hidden rounded-2xl p-5 active:opacity-70 mb-4"
       style={{ 
-        background: `linear-gradient(135deg, ${eventColor}15 0%, ${eventColor}08 100%)`,
-        borderLeft: `4px solid ${eventColor}`,
-        boxShadow: isCompleted 
-          ? `0 2px 10px -4px ${eventColor}20` 
-          : `0 4px 20px -4px ${eventColor}40, 0 0 0 1px ${eventColor}20`,
-        transition: 'all 0.1s ease'
+        background: `linear-gradient(135deg, ${eventColor}12 0%, ${eventColor}06 100%)`,
+        borderLeft: `3px solid ${eventColor}`,
+        boxShadow: `0 2px 8px ${eventColor}20`,
+        opacity: isCompleted ? 0.5 : 1
       }}
     >
-      {/* Animated gradient overlay */}
-      <motion.div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: `radial-gradient(circle at top right, ${eventColor}20, transparent 70%)`,
-        }}
-      />
       
-      <div className="relative flex justify-between items-start">
+      <div className="flex justify-between items-start">
         <div className="flex-1">
           {/* Checkbox for completion */}
           <div className="flex items-center gap-3 mb-3">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <input
+              type="checkbox"
+              checked={isCompleted}
+              onChange={toggleCompletion}
+              onClick={(e) => e.stopPropagation()}
+              className="w-5 h-5 rounded"
+              style={{ accentColor: eventColor }}
+            />
+            <span 
+              className="text-xs uppercase font-bold px-2 py-0.5 rounded"
+              style={{ 
+                color: eventColor,
+                backgroundColor: `${eventColor}15`,
+              }}
             >
-              <input
-                type="checkbox"
-                checked={isCompleted}
-                onChange={toggleCompletion}
-                onClick={(e) => e.stopPropagation()}
-                className="w-6 h-6 rounded-md cursor-pointer transition-all"
-                style={{ accentColor: eventColor }}
-              />
-            </motion.div>
-            <div className="flex items-center gap-2">
-              <span 
-                className="text-xs uppercase font-bold tracking-wider px-2 py-1 rounded-lg"
-                style={{ 
-                  color: eventColor,
-                  backgroundColor: `${eventColor}20`,
-                }}
-              >
-                {eventItem.type}
-              </span>
-            </div>
+              {eventItem.type}
+            </span>
           </div>
           
           <h3 
-            className={`text-2xl font-bold tracking-tight ${isCompleted ? 'line-through' : ''}`}
+            className={`text-xl font-bold ${isCompleted ? 'line-through' : ''}`}
             style={{ color: eventColor }}
           >
             {eventItem.courseCode}
           </h3>
-          <p className={`text-sm text-gray-300 mt-2 font-medium ${isCompleted ? 'line-through' : ''}`}>
+          <p className={`text-sm text-gray-400 mt-1 ${isCompleted ? 'line-through' : ''}`}>
             {eventItem.title}
           </p>
         </div>
         
-        <div className="text-right flex flex-col items-end gap-3">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" style={{ color: eventColor }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-xl font-bold" style={{ color: eventColor }}>
-              {eventItem.time}
-            </p>
-          </div>
+        <div className="text-right flex flex-col items-end gap-2">
+          <p className="text-lg font-bold" style={{ color: eventColor }}>
+            {eventItem.time}
+          </p>
           
           {/* Edit button */}
           {onEdit && (
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={handleEditClick}
-              className="p-2 rounded-xl transition-all"
+              className="p-1.5 rounded-lg active:opacity-70"
               style={{ 
-                backgroundColor: `${eventColor}15`,
+                backgroundColor: `${eventColor}12`,
                 color: eventColor 
               }}
             >
@@ -230,7 +167,7 @@ export default function ClassBlock({ item, onEdit }: ClassBlockProps) {
                 viewBox="0 0 24 24" 
                 strokeWidth={2.5} 
                 stroke="currentColor" 
-                className="w-5 h-5"
+                className="w-4 h-4"
               >
                 <path 
                   strokeLinecap="round" 
@@ -238,22 +175,18 @@ export default function ClassBlock({ item, onEdit }: ClassBlockProps) {
                   d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" 
                 />
               </svg>
-            </motion.button>
+            </button>
           )}
         </div>
       </div>
       
       {/* Completion badge */}
       {isCompleted && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="absolute top-3 right-3"
-        >
+        <div className="absolute top-3 right-3">
           <div 
-            className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"
+            className="px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1"
             style={{
-              backgroundColor: `${eventColor}25`,
+              backgroundColor: `${eventColor}20`,
               color: eventColor
             }}
           >
@@ -262,8 +195,8 @@ export default function ClassBlock({ item, onEdit }: ClassBlockProps) {
             </svg>
             Done
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
